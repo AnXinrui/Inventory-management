@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.axr.stockmanage.mapper.StockMapper" >
+
+    <!-- 根据商品ID查询库存信息 -->
+    <select id="findByProductId" parameterType="int" resultType="com.axr.stockmanage.model.Stock">
+        SELECT id, product_id, quantity, update_time
+        FROM stock
+        WHERE product_id = #{productId}
+    </select>
+
+    <!-- 增加库存 -->
+    <update id="increaseStock" parameterType="map">
+        UPDATE stock
+        SET quantity = quantity + #{quantity}, update_time = CURRENT_TIMESTAMP
+        WHERE product_id = #{productId}
+    </update>
+
+    <!-- 减少库存 -->
+    <update id="decreaseStock" parameterType="map">
+        UPDATE stock
+        SET quantity = quantity - #{quantity}, update_time = CURRENT_TIMESTAMP
+        WHERE product_id = #{productId}
+    </update>
+
+</mapper>
