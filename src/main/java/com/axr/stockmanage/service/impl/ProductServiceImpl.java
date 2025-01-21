@@ -77,7 +77,7 @@ public class ProductServiceImpl implements ProductService {
         if (stockResult != 1 || productResult != 1) {
             throw new BusinessException("删除商品失败");
         }
-        return stockResult + productResult;
+        return productResult;
     }
 
     /**

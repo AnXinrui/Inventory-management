@@ -29,6 +29,9 @@ public class ProductController {
 
     @PostMapping("delete")
     public Result<Integer> deleteProduct(Integer id) {
+        if (id == null) {
+            throw new BusinessException("商品ID不能为空");
+        }
         return Result.success(productService.deleteProduct(id));
     }
 
