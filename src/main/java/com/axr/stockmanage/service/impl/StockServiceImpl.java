@@ -7,10 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
+
 @Service
 public class StockServiceImpl implements StockService {
 
-    @Autowired
+    @Resource
     private StockMapper stockMapper;
 
     /**
@@ -21,21 +23,11 @@ public class StockServiceImpl implements StockService {
      */
     @Transactional
     @Override
-    public void increaseStock(int productId, int quantity) {
-        stockMapper.increaseStock(productId, quantity);
+    public int updateStock(int productId, int quantity) {
+        return stockMapper.updateStock(productId, quantity);
     }
 
-    /**
-     * 减少库存
-     * 
-     * @param productId 商品ID
-     * @param quantity 减少的库存数量
-     */
-    @Transactional
-    @Override
-    public void decreaseStock(int productId, int quantity) {
-        stockMapper.decreaseStock(productId, quantity);
-    }
+
 
     /**
      * 根据商品ID获取库存

@@ -1,6 +1,9 @@
 package com.axr.stockmanage.service;
 
 import com.axr.stockmanage.model.Product;
+import com.axr.stockmanage.model.dto.ProductDTO;
+
+import java.util.List;
 
 /**
  * @author xinrui.an
@@ -11,29 +14,37 @@ public interface ProductService {
     /**
      * 添加商品
      *
-     * @param product 商品对象
+     * @param dto 商品信息
+     * @return product id
      */
-    void addProduct(Product product);
+    Integer addProduct(ProductDTO dto);
 
     /**
      * 更新商品信息
      *
      * @param product 商品对象
      */
-    void updateProduct(Product product);
+    Integer updateProduct(Product product);
 
     /**
      * 删除商品
      *
      * @param id 商品ID
+     * @return success
      */
-    void deleteProduct(int id);
+    Integer deleteProduct(int id);
 
     /**
      * 更新商品状态
      *
      * @param id     商品ID
-     * @param status 商品状态（0表示下架，1表示上架）
      */
-    void updateProductStatus(int id, String status);
+    boolean updateProductStatus(int id);
+
+
+    /**
+     *
+     * @return product list
+     */
+    List<Product> listAll();
 }

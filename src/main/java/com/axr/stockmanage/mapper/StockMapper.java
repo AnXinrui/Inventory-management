@@ -3,6 +3,10 @@ package com.axr.stockmanage.mapper;
 import com.axr.stockmanage.model.Stock;
 import org.apache.ibatis.annotations.Mapper;
 
+/**
+ * @author xinrui.an
+ * @date 2025/01/20
+ */
 @Mapper
 public interface StockMapper {
 
@@ -15,13 +19,13 @@ public interface StockMapper {
     Stock findByProductId(int productId);
 
     /**
-     * 增加库存
+     * 修改库存
      *
      * @param productId 商品ID
-     * @param quantity 增加的库存数量
+     * @param quantity 修改的库存数量
      * @return int 返回更新的记录数
      */
-    int increaseStock(int productId, int quantity);
+    int updateStock(int productId, int quantity);
 
     /**
      * 减少库存
@@ -31,4 +35,18 @@ public interface StockMapper {
      * @return int 返回更新的记录数
      */
     int decreaseStock(int productId, int quantity);
+
+    /**
+     * 添加库存信息
+     *
+     * @param stock stock
+     */
+    void add(Stock stock);
+
+    /**
+     *
+     * @param productId product id
+     * @return r
+     */
+    int deleteByProductId(int productId);
 }

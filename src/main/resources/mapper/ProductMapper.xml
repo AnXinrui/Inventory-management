@@ -15,6 +15,9 @@
     <select id="findAll" resultType="com.axr.stockmanage.model.Product">
         SELECT * FROM product
     </select>
+    <select id="findByName" resultType="com.axr.stockmanage.model.Product">
+        SELECT * FROM product  WHERE name = #{name} LIMIT 1
+    </select>
 
     <!-- 删除商品 -->
     <delete id="deleteProduct" parameterType="int">
@@ -31,7 +34,7 @@
     <!-- 更新商品状态 -->
     <update id="updateStatus" parameterType="map">
         UPDATE product
-        SET status = #{status}, update_time = CURRENT_TIMESTAMP
+        SET status = #{status}
         WHERE id = #{id}
     </update>
 </mapper>

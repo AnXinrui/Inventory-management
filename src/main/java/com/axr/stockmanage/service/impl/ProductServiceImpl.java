@@ -1,11 +1,17 @@
 package com.axr.stockmanage.service.impl;
 
+import com.axr.stockmanage.common.BusinessException;
 import com.axr.stockmanage.mapper.ProductMapper;
+import com.axr.stockmanage.mapper.StockMapper;
 import com.axr.stockmanage.model.Product;
+import com.axr.stockmanage.model.Stock;
+import com.axr.stockmanage.model.dto.ProductDTO;
 import com.axr.stockmanage.service.ProductService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author xinrui.an
@@ -14,18 +20,35 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ProductServiceImpl implements ProductService {
 
-    @Autowired
+    @Resource
     private ProductMapper productMapper;
+    @Resource
+    private StockMapper stockMapper;
 
     /**
      * 添加商品
      *
-     * @param product 商品对象
+     * @param dto 商品信息
+     * @return product id
      */
-    @Transactional
     @Override
-    public void addProduct(Product product) {
+    @Transactional
+    public Integer addProduct(ProductDTO dto) {
+        if (productMapper.findByName(dto.getName()) != null) {
+            throw new BusinessException("商品已存在");
+        }
+        Product product = Product.builder()
+                .name(dto.getName())
+                .price(dto.getPrice())
+                .build();
         productMapper.addProduct(product);
+        Integer productId = product.getId();
+        Stock stock = Stock.builder()
+                .productId(productId)
+                .quantity(dto.getQuantity())
+                .build();
+        stockMapper.add(stock);
+        return productId;
     }
 
     /**
@@ -33,10 +56,9 @@ public class ProductServiceImpl implements ProductService {
      *
      * @param product 商品对象
      */
-    @Transactional
     @Override
-    public void updateProduct(Product product) {
-        productMapper.updateProduct(product);
+    public Integer updateProduct(Product product) {
+        return productMapper.updateProduct(product);
     }
 
     /**
@@ -44,21 +66,34 @@ public class ProductServiceImpl implements ProductService {
      *
      * @param id 商品ID
      */
-    @Transactional
     @Override
-    public void deleteProduct(int id) {
-        productMapper.deleteProduct(id);
+    @Transactional
+    public Integer deleteProduct(int id) {
+        int res = 0;
+        res += stockMapper.deleteByProductId(id);
+        res += productMapper.deleteProduct(id);
+        return res;
     }
 
     /**
      * 更新商品状态
      *
      * @param id     商品ID
-     * @param status 商品状态（0表示下架，1表示上架）
      */
     @Transactional
     @Override
-    public void updateProductStatus(int id, String status) {
-        productMapper.updateStatus(id, status);
+    public boolean updateProductStatus(int id) {
+        Product product = productMapper.findById(id);
+        if (product == null) {
+            throw new BusinessException("商品不存在");
+        }
+        int status = product.getStatus();
+        productMapper.updateStatus(id, status ^ 1);
+        return true;
+    }
+
+    @Override
+    public List<Product> listAll() {
+        return productMapper.findAll();
     }
 }

@@ -2,7 +2,6 @@ package com.axr.stockmanage.mapper;
 
 import com.axr.stockmanage.model.Product;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -28,6 +27,14 @@ public interface ProductMapper {
      * @return 商品对象
      */
     Product findById(int id);
+
+    /**
+     * 根据商品名称查询商品
+     *
+     * @param name product name
+     * @return product
+     */
+    Product findByName(String name);
 
     /**
      * 查询所有商品
@@ -59,6 +66,6 @@ public interface ProductMapper {
      * @param status 商品状态（0表示下架，1表示上架）
      * @return 受影响的行数
      */
-    int updateStatus(int id, String status);
+    int updateStatus(int id, int status);
 
 }
