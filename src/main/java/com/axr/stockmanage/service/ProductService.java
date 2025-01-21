@@ -23,6 +23,7 @@ public interface ProductService {
      * 更新商品信息
      *
      * @param product 商品对象
+     * @return 修改信息
      */
     Integer updateProduct(Product product);
 
@@ -38,11 +39,13 @@ public interface ProductService {
      * 更新商品状态
      *
      * @param id     商品ID
+     * @return success
      */
     boolean updateProductStatus(int id);
 
 
     /**
+     * 查询 product 列表
      *
      * @return product list
      */

@@ -9,6 +9,7 @@ public interface StockService {
      * 
      * @param productId 商品ID
      * @param quantity 增加或减少的库存数量
+     * @return success
      */
     int updateStock(int productId, int quantity);
 

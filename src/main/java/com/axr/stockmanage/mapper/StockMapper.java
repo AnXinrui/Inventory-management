@@ -28,15 +28,6 @@ public interface StockMapper {
     int updateStock(int productId, int quantity);
 
     /**
-     * 减少库存
-     *
-     * @param productId 商品ID
-     * @param quantity 减少的库存数量
-     * @return int 返回更新的记录数
-     */
-    int decreaseStock(int productId, int quantity);
-
-    /**
      * 添加库存信息
      *
      * @param stock stock
@@ -44,6 +35,7 @@ public interface StockMapper {
     void add(Stock stock);
 
     /**
+     * 根据 product id 删除库存信息
      *
      * @param productId product id
      * @return r
