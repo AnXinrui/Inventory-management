@@ -69,16 +69,21 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public Integer deleteProduct(int id) {
-        int res = 0;
-        res += stockMapper.deleteByProductId(id);
-        res += productMapper.deleteProduct(id);
-        return res;
+        if (productMapper.findById(id) == null) {
+            throw new BusinessException("商品不存在");
+        }
+        int stockResult = stockMapper.deleteByProductId(id);
+        int productResult = productMapper.deleteProduct(id);
+        if (stockResult != 1 || productResult != 1) {
+            throw new BusinessException("删除商品失败");
+        }
+        return stockResult + productResult;
     }
 
     /**
      * 更新商品状态
      *
-     * @param id     商品ID
+     * @param id 商品ID
      */
     @Transactional
     @Override

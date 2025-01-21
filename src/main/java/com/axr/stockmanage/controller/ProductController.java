@@ -1,5 +1,6 @@
 package com.axr.stockmanage.controller;
 
+import com.axr.stockmanage.common.BusinessException;
 import com.axr.stockmanage.common.Result;
 import com.axr.stockmanage.model.Product;
 import com.axr.stockmanage.model.dto.ProductDTO;
@@ -38,6 +39,9 @@ public class ProductController {
 
     @PostMapping("update")
     public Result<Integer> updateProduct(@RequestBody Product product) {
+        if (product == null || product.getId() == null) {
+            throw new BusinessException("商品信息不完整");
+        }
         return Result.success(productService.updateProduct(product));
     }
 
