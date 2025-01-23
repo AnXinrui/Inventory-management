@@ -7,15 +7,35 @@
     </insert>
 
     <!-- 根据商品ID查询商品 -->
-    <select id="findById" parameterType="int" resultType="com.axr.stockmanage.model.Product">
+    <select id="findById" parameterType="int" resultType="com.axr.stockmanage.model.entity.Product">
         SELECT * FROM product WHERE id = #{id}
     </select>
 
     <!-- 查询所有商品 -->
-    <select id="findAll" resultType="com.axr.stockmanage.model.Product">
-        SELECT * FROM product
+    <select id="find" resultType="com.axr.stockmanage.model.vo.ProductVO" parameterType="com.axr.stockmanage.model.entity.Product">
+        SELECT
+        p.id as id,
+        p.name as name,
+        p.price as price,
+        p.status as status,
+        s.quantity as quantity
+        FROM product p JOIN stock s on p.id = s.product_id
+        <where>
+            <if test="name != null and name != ''">
+                AND p.name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="price != null">
+                AND p.price = #{price}
+            </if>
+            <if test="status != null">
+                AND p.status = #{status}
+            </if>
+            <if test="quantity != null">
+                AND s.quantity = #{quantity}
+            </if>
+        </where>
     </select>
-    <select id="findByName" resultType="com.axr.stockmanage.model.Product">
+    <select id="findByName" resultType="com.axr.stockmanage.model.entity.Product">
         SELECT * FROM product  WHERE name = #{name} LIMIT 1
     </select>
 
@@ -25,9 +45,16 @@
     </delete>
 
     <!-- 更新商品信息 -->
-    <update id="updateProduct" parameterType="com.axr.stockmanage.model.Product">
+    <update id="updateProduct" parameterType="com.axr.stockmanage.model.entity.Product">
         UPDATE product
-        SET name = #{name}, price = #{price}, status = #{status}, update_time = CURRENT_TIMESTAMP
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="price != null">
+                price = #{price}
+            </if>
+        </set>
         WHERE id = #{id}
     </update>
 

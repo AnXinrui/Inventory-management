@@ -9,8 +9,10 @@ import java.math.BigDecimal;
  * @date 2025/01/21
  */
 @Data
-public class ProductDTO {
+public class ProductAddDTO {
+
     private String name;
+
     private BigDecimal price;
-    private Integer quantity;
+
 }

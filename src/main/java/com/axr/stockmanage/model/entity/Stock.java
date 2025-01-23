@@ -1,4 +1,4 @@
-package com.axr.stockmanage.model;
+package com.axr.stockmanage.model.entity;
 
 import lombok.Builder;
 import lombok.Data;
@@ -12,5 +12,5 @@ import lombok.Data;
 public class Stock {
     private Integer id;
     private Integer productId;
-    private int quantity;
+    private Integer quantity;
 }

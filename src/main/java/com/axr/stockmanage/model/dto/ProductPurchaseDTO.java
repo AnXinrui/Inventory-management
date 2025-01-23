@@ -1,17 +1,15 @@
 package com.axr.stockmanage.model.dto;
 
-import lombok.Builder;
 import lombok.Data;
 
 /**
  * @author xinrui.an
- * @date 2025/01/21
+ * @date 2025/01/23
  */
 @Data
-@Builder
-public class StockDTO {
+public class ProductPurchaseDTO {
 
     private Integer productId;
 
-    private Integer updateQuantity;
+    private Integer quantity;
 }

@@ -1,6 +1,8 @@
 package com.axr.stockmanage.mapper;
 
-import com.axr.stockmanage.model.Product;
+import com.axr.stockmanage.model.dto.ProductUpdateDTO;
+import com.axr.stockmanage.model.entity.Product;
+import com.axr.stockmanage.model.vo.ProductVO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -41,7 +43,7 @@ public interface ProductMapper {
      *
      * @return 商品列表
      */
-    List<Product> findAll();
+    List<ProductVO> find(Product product);
 
     /**
      * 删除商品
@@ -54,10 +56,10 @@ public interface ProductMapper {
     /**
      * 更新商品信息
      *
-     * @param product 商品对象
+     * @param dto 商品信息
      * @return 受影响的行数
      */
-    int updateProduct(Product product);
+    int updateProduct(ProductUpdateDTO dto);
 
     /**
      * 更新商品状态

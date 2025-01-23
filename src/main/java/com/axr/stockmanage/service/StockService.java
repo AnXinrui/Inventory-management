@@ -1,17 +1,17 @@
 package com.axr.stockmanage.service;
 
-import com.axr.stockmanage.model.Stock;
+import com.axr.stockmanage.model.dto.StockDTO;
+import com.axr.stockmanage.model.entity.Stock;
 
 public interface StockService {
 
     /**
      * 修改库存
      * 
-     * @param productId 商品ID
-     * @param quantity 增加或减少的库存数量
+     * @param dto 库存信息
      * @return success
      */
-    int updateStock(int productId, int quantity);
+    int updateStock(StockDTO dto);
 
 
 

@@ -1,7 +1,9 @@
 package com.axr.stockmanage.mapper;
 
-import com.axr.stockmanage.model.Stock;
+import com.axr.stockmanage.model.dto.StockDTO;
+import com.axr.stockmanage.model.entity.Stock;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * @author xinrui.an
@@ -14,21 +16,27 @@ public interface StockMapper {
      * 根据商品ID获取库存信息
      *
      * @param productId 商品ID
-     * @return Stock 库存对象，包含库存数量和更新时间
+     * @return Stock 库存对象
      */
     Stock findByProductId(int productId);
 
     /**
-     * 修改库存
-     *
+     * 加入悲观锁查询
      * @param productId 商品ID
-     * @param quantity 修改的库存数量
-     * @return int 返回更新的记录数
+     * @return 库存信息
      */
-    int updateStock(int productId, int quantity);
+    Stock findByProductIdForUpdate(@Param("productId") Integer productId);
 
     /**
-     * 添加库存信息
+     * 修改库存
+     *
+     * @param dto 库存修改信息
+     * @return int 返回更新的记录数
+     */
+    int updateStock(StockDTO dto);
+
+    /**
+     * 新增库存信息
      *
      * @param stock stock
      */
@@ -41,4 +49,6 @@ public interface StockMapper {
      * @return r
      */
     int deleteByProductId(int productId);
+
+
 }

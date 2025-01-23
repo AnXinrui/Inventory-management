@@ -1,19 +1,19 @@
-package com.axr.stockmanage.model;
+package com.axr.stockmanage.model.dto;
 
-import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
 
 /**
  * @author xinrui.an
- * @date 2025/01/20
+ * @date 2025/01/23
  */
 @Data
-@Builder
-public class Product {
+public class ProductUpdateDTO {
+
     private Integer id;
+
     private String name;
+
     private BigDecimal price;
-    private int status;
 }

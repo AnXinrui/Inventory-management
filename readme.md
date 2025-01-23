@@ -34,3 +34,15 @@ CREATE TABLE stock (
     FOREIGN KEY (product_id) REFERENCES product(id)  
 ) COLLATE = utf8mb4_general_ci COMMENT = '库存表';
 ```
+
+#### 核心功能：
+- 商品
+  - 新增商品 （默认库存为 0）
+  - 删除商品
+  - 修改商品信息
+  - 上下架管理
+  - 查询商品 （根据商品名称或id）
+  - 购买商品
+- 库存
+  - 增加或减少库存
+  - 查询库存

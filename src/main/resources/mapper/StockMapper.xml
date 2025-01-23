@@ -9,16 +9,22 @@
     </delete>
 
     <!-- 根据商品ID查询库存信息 -->
-    <select id="findByProductId" parameterType="int" resultType="com.axr.stockmanage.model.Stock">
-        SELECT id, product_id, quantity, update_time
+    <select id="findByProductId" parameterType="int" resultType="com.axr.stockmanage.model.entity.Stock">
+        SELECT id, product_id, quantity
         FROM stock
         WHERE product_id = #{productId}
+    </select>
+    <select id="findByProductIdForUpdate" resultType="com.axr.stockmanage.model.entity.Stock">
+        SELECT id, product_id, quantity
+        FROM stock
+        WHERE product_id = #{productId}
+        FOR UPDATE
     </select>
 
     <!-- 修改库存 -->
     <update id="updateStock" parameterType="map">
         UPDATE stock
-        SET quantity = #{quantity}
+        SET quantity = quantity + #{updateQuantity}
         WHERE product_id = #{productId}
     </update>
 

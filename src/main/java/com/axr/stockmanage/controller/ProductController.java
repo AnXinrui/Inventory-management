@@ -2,8 +2,11 @@ package com.axr.stockmanage.controller;
 
 import com.axr.stockmanage.common.BusinessException;
 import com.axr.stockmanage.common.Result;
-import com.axr.stockmanage.model.Product;
-import com.axr.stockmanage.model.dto.ProductDTO;
+import com.axr.stockmanage.model.dto.ProductPurchaseDTO;
+import com.axr.stockmanage.model.dto.ProductUpdateDTO;
+import com.axr.stockmanage.model.entity.Product;
+import com.axr.stockmanage.model.dto.ProductAddDTO;
+import com.axr.stockmanage.model.vo.ProductVO;
 import com.axr.stockmanage.service.ProductService;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +25,7 @@ public class ProductController {
     private ProductService productService;
 
     @PostMapping("add")
-    public Result<Integer> addProduct(@RequestBody ProductDTO dto) {
+    public Result<Integer> addProduct(@RequestBody ProductAddDTO dto) {
         Integer id = productService.addProduct(dto);
         return Result.success(id);
     }
@@ -36,16 +39,21 @@ public class ProductController {
     }
 
     @GetMapping("list")
-    public Result<List<Product>> listProduct() {
-        return Result.success(productService.listAll());
+    public Result<List<ProductVO>> listProduct(Product product) {
+        return Result.success(productService.list(product));
     }
 
     @PostMapping("update")
-    public Result<Integer> updateProduct(@RequestBody Product product) {
-        if (product == null || product.getId() == null) {
+    public Result<Integer> updateProduct(@RequestBody ProductUpdateDTO dto) {
+        if (dto == null || dto.getId() == null) {
             throw new BusinessException("商品信息不完整");
         }
-        return Result.success(productService.updateProduct(product));
+        return Result.success(productService.updateProduct(dto));
+    }
+
+    @PostMapping("purchase")
+    public Result<ProductVO> productPurchase(@RequestBody ProductPurchaseDTO dto) {
+        return Result.success(productService.purchaseProduct(dto));
     }
 
     @PostMapping("updateStatus")
