@@ -94,14 +94,15 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public ProductVO purchaseProduct(ProductPurchaseDTO dto) {
         if (dto.getProductId() == null || dto.getQuantity() == null || dto.getQuantity() < 1) {
             throw new BusinessException("商品信息错误");
         }
         Integer productId = dto.getProductId();
         stockService.updateStock(StockDTO.builder()
-                        .productId(productId)
-                        .updateQuantity(dto.getQuantity() * -1)
+                .productId(productId)
+                .updateQuantity(dto.getQuantity() * -1)
                 .build());
         List<ProductVO> products = productMapper.find(Product.builder().id(productId).build());
         if (products.isEmpty()) {
