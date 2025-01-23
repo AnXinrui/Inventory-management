@@ -28,8 +28,11 @@ public class StockServiceImpl implements StockService {
             throw new BusinessException("库存不足");
         }
 
-        // 执行库存更新
-        return stockMapper.updateStock(dto);
+        int updated = stockMapper.updateStock(dto);
+        if (updated != 1) {
+            throw new BusinessException("库存更新失败");
+        }
+        return updated;
     }
 
 

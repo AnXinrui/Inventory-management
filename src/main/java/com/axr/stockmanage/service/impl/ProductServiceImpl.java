@@ -57,7 +57,7 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public Integer deleteProduct(int id) {
         if (productMapper.findById(id) == null) {
-            throw new BusinessException("商品不存在");
+            throw new BusinessException("该商品不存在");
         }
         int stockResult = stockMapper.deleteByProductId(id);
         int productResult = productMapper.deleteProduct(id);
@@ -68,7 +68,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public Integer updateProduct(ProductUpdateDTO dto) {
+        if (productMapper.findById(dto.getId()) == null) {
+            throw new BusinessException("商品不存在");
+        }
         return productMapper.updateProduct(dto);
     }
 
@@ -99,6 +103,10 @@ public class ProductServiceImpl implements ProductService {
                         .productId(productId)
                         .updateQuantity(dto.getQuantity() * -1)
                 .build());
-        return productMapper.find(Product.builder().id(productId).build()).get(0);
+        List<ProductVO> products = productMapper.find(Product.builder().id(productId).build());
+        if (products.isEmpty()) {
+            throw new BusinessException("商品已售罄");
+        }
+        return products.get(0);
     }
 }
