@@ -41,6 +41,7 @@ public interface ProductMapper {
     /**
      * 查询所有商品
      *
+     * @param product 商品信息
      * @return 商品列表
      */
     List<ProductVO> find(Product product);

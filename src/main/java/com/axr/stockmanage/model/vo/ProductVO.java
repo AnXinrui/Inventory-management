@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @Data
 public class ProductVO {
 
-    private int id;
+    private Integer id;
 
     private String name;
 

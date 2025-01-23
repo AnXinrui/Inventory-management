@@ -50,6 +50,7 @@ public interface ProductService {
     /**
      * 查询 product
      *
+     * @param  product 信息
      * @return 满足条件的 product 列表
      */
     List<ProductVO> list(Product product);
