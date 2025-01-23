@@ -84,6 +84,9 @@ public class ProductServiceImpl implements ProductService {
             throw new BusinessException("商品不存在");
         }
         int status = product.getStatus();
+        if (status != 0 && status != 1) {
+            throw new BusinessException("商品状态异常");
+        }
         productMapper.updateStatus(id, status ^ 1);
         return true;
     }
@@ -106,7 +109,7 @@ public class ProductServiceImpl implements ProductService {
                 .build());
         List<ProductVO> products = productMapper.find(Product.builder().id(productId).build());
         if (products.isEmpty()) {
-            throw new BusinessException("商品已售罄");
+            throw new BusinessException("系统错误");
         }
         return products.get(0);
     }
