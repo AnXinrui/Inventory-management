@@ -16,15 +16,15 @@ USE StockManagementDB;
 ```mysql
 CREATE TABLE product
 (
-    id INT AUTO_INCREMENT PRIMARY KEY COMMENT '商品ID',
-    name VARCHAR(255) NOT NULL COMMENT '商品名称',
-    price DECIMAL(10, 2) NOT NULL COMMENT '商品价格',
-    status TINYINT(1) DEFAULT 0 NOT NULL COMMENT '商品状态，0表示下架，1表示上架',
-    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL COMMENT '商品创建时间',
-    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '商品更新时间',
-    CONSTRAINT unique_product_name UNIQUE (name)
-)
-COMMENT = '商品表' COLLATE = utf8mb4_general_ci;
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '商品ID',
+  name VARCHAR(255) NOT NULL COMMENT '商品名称',
+  price DECIMAL(10, 2) NOT NULL COMMENT '商品价格',
+  status TINYINT(1) DEFAULT 0 NOT NULL COMMENT '商品状态，0表示下架，1表示上架',
+  create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  update_time DATETIME DEFAULT CURRENT_TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (id) USING BTREE,
+  UNIQUE KEY uniq_name(name)
+) ENGINE=InnoDB COMMENT = '商品表（学习使用 axr)';
 
 ```
 **库存表 (stock)**
@@ -32,15 +32,13 @@ COMMENT = '商品表' COLLATE = utf8mb4_general_ci;
 ```mysql
 CREATE TABLE stock
 (
-    id INT AUTO_INCREMENT PRIMARY KEY COMMENT '库存记录ID',
-    product_id INT NOT NULL COMMENT '商品ID',
-    quantity INT NOT NULL COMMENT '库存数量',
-    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '库存更新时间',
-    CONSTRAINT stock_pk UNIQUE (product_id),
-    CONSTRAINT unique_product_id UNIQUE (product_id),
-    CONSTRAINT stock_ibfk_1 FOREIGN KEY (product_id) REFERENCES product (id)
-)
-COMMENT = '库存表' COLLATE = utf8mb4_general_ci;
+  id BIGINT UNSIGNED AUTO_INCREMENT COMMENT '库存记录ID',
+  product_id BIGINT NOT NULL COMMENT '商品ID',
+  quantity INT NOT NULL COMMENT '库存数量',
+  update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (id) USING BTREE,
+  UNIQUE KEY uniq_product_id(product_id)
+) ENGINE=InnoDB COMMENT = '库存表（学习使用 axr)';
 
 ```
 
