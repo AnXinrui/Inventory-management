@@ -38,6 +38,12 @@ public class ProductController {
         return Result.success(productService.deleteProduct(id));
     }
 
+    @GetMapping(value = "/{id}")
+    public Result<Product> findProduct(@PathVariable Long id) {
+        Product product = productService.findById(id);
+        return Result.success(product);
+    }
+
     @GetMapping("list")
     public Result<List<ProductVO>> listProducts(Product product) {
         return Result.success(productService.list(product));

@@ -17,7 +17,7 @@ public class StockServiceImpl implements StockService {
     private StockMapper stockMapper;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, timeout = 1000)
     public int updateStock(StockDTO dto) throws BusinessException {
         // 使用 FOR UPDATE 查询库存，并加锁
         Stock stock = stockMapper.findByProductIdForUpdate(dto.getProductId());

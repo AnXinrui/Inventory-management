@@ -1,5 +1,6 @@
 package com.axr.stockmanage.service;
 
+import com.alicp.jetcache.anno.Cached;
 import com.axr.stockmanage.model.dto.ProductAddDTO;
 import com.axr.stockmanage.model.dto.ProductPurchaseDTO;
 import com.axr.stockmanage.model.dto.ProductUpdateDTO;
@@ -46,6 +47,12 @@ public interface ProductService {
      */
     boolean updateProductStatus(long id);
 
+    /**
+     * 根据 id 获取商品
+     * @param id id
+     * @return product
+     */
+    Product findById(long id);
 
     /**
      * 查询 product

@@ -14,7 +14,7 @@ USE StockManagementDB;
 
 **商品表(product)**
 ```mysql
-CREATE TABLE product
+CREATE TABLE t_product
 (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '商品ID',
   name VARCHAR(255) NOT NULL COMMENT '商品名称',
@@ -30,7 +30,7 @@ CREATE TABLE product
 **库存表 (stock)**
 
 ```mysql
-CREATE TABLE stock
+CREATE TABLE t_stock
 (
   id BIGINT UNSIGNED AUTO_INCREMENT COMMENT '库存记录ID',
   product_id BIGINT NOT NULL COMMENT '商品ID',

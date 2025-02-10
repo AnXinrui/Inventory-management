@@ -3,20 +3,20 @@
 <mapper namespace="com.axr.stockmanage.mapper.ProductMapper">
 
     <insert id="addProduct" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO t_test_product_selfdata (name, price)
+        INSERT INTO t_product (name, price)
         VALUES (#{name}, #{price})
     </insert>
 
     <!-- 根据商品ID查询商品 -->
     <select id="findById" parameterType="long" resultType="com.axr.stockmanage.model.entity.Product">
         SELECT *
-        FROM t_test_product_selfdata
+        FROM t_product
         WHERE id = #{id}
     </select>
 
     <select id="findByIdForUpdate" parameterType="long" resultType="com.axr.stockmanage.model.entity.Product">
         SELECT *
-        FROM t_test_product_selfdata
+        FROM t_product
         WHERE id = #{id}
             FOR UPDATE
     </select>
@@ -30,7 +30,7 @@
         p.price as price,
         p.status as status,
         s.quantity as quantity
-        FROM t_test_product_selfdata p JOIN t_test_stock_selfdata s on p.id = s.product_id
+        FROM t_product p JOIN t_stock s on p.id = s.product_id
         <where>
             <if test="name != null and name != ''">
                 AND p.name LIKE CONCAT('%', #{name}, '%')
@@ -45,7 +45,7 @@
     </select>
     <select id="findByName" resultType="com.axr.stockmanage.model.entity.Product">
         SELECT *
-        FROM t_test_product_selfdata
+        FROM t_product
         WHERE name = #{name}
         LIMIT 1
     </select>
@@ -56,20 +56,20 @@
                p.price    as price,
                p.status   as status,
                s.quantity as quantity
-        FROM t_test_product_selfdata p
-                 JOIN t_test_stock_selfdata s on p.id = s.product_id
+        FROM t_product p
+                 JOIN t_stock s on p.id = s.product_id
     </select>
 
     <!-- 删除商品 -->
     <delete id="deleteProduct" parameterType="int">
         DELETE
-        FROM t_test_product_selfdata
+        FROM t_product
         WHERE id = #{id}
     </delete>
 
     <!-- 更新商品信息 -->
     <update id="updateProduct" parameterType="com.axr.stockmanage.model.entity.Product">
-        UPDATE t_test_product_selfdata
+        UPDATE t_product
         <set>
             <if test="name != null and name != ''">
                 name = #{name},
@@ -83,7 +83,7 @@
 
     <!-- 更新商品状态 -->
     <update id="updateStatus" parameterType="map">
-        UPDATE t_test_product_selfdata
+        UPDATE t_product
         SET status = #{status}
         WHERE id = #{id}
     </update>

@@ -4,9 +4,59 @@ spring:
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
+  main:
+    allow-circular-references: true
+  redis:
+    host: localhost
+    port: 6379
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 #  type-aliases-package: org.axr.model
 #  configuration:
 #    map-underscore-to-camel-case: true
+
+#jetcache:
+#  statIntervalMinutes: 15
+#  areaInCacheName: false
+#  local:
+#    default:
+#      type: caffeine
+#      limit: 100
+#      expireAfterWriteInMillis: 600000 # 10 分钟
+#  remote:
+#    default:
+#      type: redis
+#      keyConvertor: fastjson
+#      valueEncoder: kryo
+#      valueDecoder: kryo
+#      expireAfterWriteInMillis: 1800000 # 30 分钟
+#  redis:
+#    host: localhost
+#    port: 6379
+#    timeout: 2000
+
+jetcache:
+  statIntervalMinutes: 1
+  # 本地配置
+  local:
+    default:
+      type: linkedhashmap
+      keyConvertor: fastjson
+      limit: 10000
+      expireAfterWriteInMillis: 60000
+  # 远程配置
+  remote:
+    default:
+      type: redis
+      host: ${spring.redis.host}
+      port: ${spring.redis.port}
+      keyConvertor: fastjson
+      valueEncode: java
+      valueDecode: java
+      poolConfig:
+        minIdle: 5
+        maxIdle: 20
+        maxTotal: 50

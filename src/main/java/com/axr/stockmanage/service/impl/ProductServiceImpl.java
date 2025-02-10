@@ -1,5 +1,7 @@
 package com.axr.stockmanage.service.impl;
 
+import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.anno.Cached;
 import com.axr.stockmanage.common.BusinessException;
 import com.axr.stockmanage.mapper.ProductMapper;
 import com.axr.stockmanage.mapper.StockMapper;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author xinrui.an
@@ -89,6 +92,12 @@ public class ProductServiceImpl implements ProductService {
         }
         productMapper.updateStatus(id, status ^ 1);
         return true;
+    }
+
+    @Override
+    @Cached(name = "productCache:", key = "'productId:' + #id", expire = 30, timeUnit = TimeUnit.SECONDS)
+    public Product findById(long id) {
+        return productMapper.findById(id);
     }
 
     @Override
