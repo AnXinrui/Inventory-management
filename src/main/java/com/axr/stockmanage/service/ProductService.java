@@ -1,9 +1,9 @@
 package com.axr.stockmanage.service;
 
+import com.axr.stockmanage.model.dto.ProductAddDTO;
 import com.axr.stockmanage.model.dto.ProductPurchaseDTO;
 import com.axr.stockmanage.model.dto.ProductUpdateDTO;
 import com.axr.stockmanage.model.entity.Product;
-import com.axr.stockmanage.model.dto.ProductAddDTO;
 import com.axr.stockmanage.model.vo.ProductVO;
 
 import java.util.List;
@@ -20,7 +20,7 @@ public interface ProductService {
      * @param dto 商品信息
      * @return product id
      */
-    Integer addProduct(ProductAddDTO dto);
+    Long addProduct(ProductAddDTO dto);
 
     /**
      * 更新商品信息
@@ -36,7 +36,7 @@ public interface ProductService {
      * @param id 商品ID
      * @return success
      */
-    Integer deleteProduct(int id);
+    Integer deleteProduct(long id);
 
     /**
      * 更新商品状态
@@ -44,7 +44,7 @@ public interface ProductService {
      * @param id 商品ID
      * @return success
      */
-    boolean updateProductStatus(int id);
+    boolean updateProductStatus(long id);
 
 
     /**
@@ -56,10 +56,18 @@ public interface ProductService {
     List<ProductVO> list(Product product);
 
     /**
+     * 查询所有 product
+     *
+     * @return productVo list
+     */
+    List<ProductVO> listAll();
+
+    /**
      * 购买 product
      *
      * @param dto 购买 product 信息
      * @return 最新 product 信息
      */
     ProductVO purchaseProduct(ProductPurchaseDTO dto);
+
 }

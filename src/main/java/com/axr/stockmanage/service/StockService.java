@@ -21,5 +21,5 @@ public interface StockService {
      * @param productId 商品ID
      * @return 库存对象
      */
-    Stock getStockByProductId(int productId);
+    Stock getStockByProductId(long productId);
 }

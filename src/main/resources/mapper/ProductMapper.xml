@@ -1,25 +1,36 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.axr.stockmanage.mapper.ProductMapper" >
+<mapper namespace="com.axr.stockmanage.mapper.ProductMapper">
 
     <insert id="addProduct" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO product (name, price) VALUES (#{name}, #{price})
+        INSERT INTO t_test_product_selfdata (name, price)
+        VALUES (#{name}, #{price})
     </insert>
 
     <!-- 根据商品ID查询商品 -->
-    <select id="findById" parameterType="int" resultType="com.axr.stockmanage.model.entity.Product">
-        SELECT * FROM product WHERE id = #{id}
+    <select id="findById" parameterType="long" resultType="com.axr.stockmanage.model.entity.Product">
+        SELECT *
+        FROM t_test_product_selfdata
+        WHERE id = #{id}
+    </select>
+
+    <select id="findByIdForUpdate" parameterType="long" resultType="com.axr.stockmanage.model.entity.Product">
+        SELECT *
+        FROM t_test_product_selfdata
+        WHERE id = #{id}
+            FOR UPDATE
     </select>
 
     <!-- 查询所有商品 -->
-    <select id="find" resultType="com.axr.stockmanage.model.vo.ProductVO" parameterType="com.axr.stockmanage.model.entity.Product">
+    <select id="find" resultType="com.axr.stockmanage.model.vo.ProductVO"
+            parameterType="com.axr.stockmanage.model.entity.Product">
         SELECT
         p.id as id,
         p.name as name,
         p.price as price,
         p.status as status,
         s.quantity as quantity
-        FROM product p JOIN stock s on p.id = s.product_id
+        FROM t_test_product_selfdata p JOIN t_test_stock_selfdata s on p.id = s.product_id
         <where>
             <if test="name != null and name != ''">
                 AND p.name LIKE CONCAT('%', #{name}, '%')
@@ -30,23 +41,35 @@
             <if test="status != null">
                 AND p.status = #{status}
             </if>
-            <if test="quantity != null">
-                AND s.quantity = #{quantity}
-            </if>
         </where>
     </select>
     <select id="findByName" resultType="com.axr.stockmanage.model.entity.Product">
-        SELECT * FROM product  WHERE name = #{name} LIMIT 1
+        SELECT *
+        FROM t_test_product_selfdata
+        WHERE name = #{name}
+        LIMIT 1
+    </select>
+
+    <select id="listAll" resultType="com.axr.stockmanage.model.vo.ProductVO">
+        SELECT p.id       as id,
+               p.name     as name,
+               p.price    as price,
+               p.status   as status,
+               s.quantity as quantity
+        FROM t_test_product_selfdata p
+                 JOIN t_test_stock_selfdata s on p.id = s.product_id
     </select>
 
     <!-- 删除商品 -->
     <delete id="deleteProduct" parameterType="int">
-        DELETE FROM product WHERE id = #{id}
+        DELETE
+        FROM t_test_product_selfdata
+        WHERE id = #{id}
     </delete>
 
     <!-- 更新商品信息 -->
     <update id="updateProduct" parameterType="com.axr.stockmanage.model.entity.Product">
-        UPDATE product
+        UPDATE t_test_product_selfdata
         <set>
             <if test="name != null and name != ''">
                 name = #{name},
@@ -60,7 +83,7 @@
 
     <!-- 更新商品状态 -->
     <update id="updateStatus" parameterType="map">
-        UPDATE product
+        UPDATE t_test_product_selfdata
         SET status = #{status}
         WHERE id = #{id}
     </update>

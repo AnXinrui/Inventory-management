@@ -11,7 +11,7 @@ import lombok.Data;
 @Builder
 public class StockDTO {
 
-    private Integer productId;
+    private Long productId;
 
     private Integer updateQuantity;
 }

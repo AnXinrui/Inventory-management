@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @Data
 public class ProductUpdateDTO {
 
-    private Integer id;
+    private Long id;
 
     private String name;
 

@@ -3,12 +3,12 @@ package com.axr.stockmanage.service.impl;
 import com.axr.stockmanage.common.BusinessException;
 import com.axr.stockmanage.mapper.ProductMapper;
 import com.axr.stockmanage.mapper.StockMapper;
+import com.axr.stockmanage.model.dto.ProductAddDTO;
 import com.axr.stockmanage.model.dto.ProductPurchaseDTO;
 import com.axr.stockmanage.model.dto.ProductUpdateDTO;
 import com.axr.stockmanage.model.dto.StockDTO;
 import com.axr.stockmanage.model.entity.Product;
 import com.axr.stockmanage.model.entity.Stock;
-import com.axr.stockmanage.model.dto.ProductAddDTO;
 import com.axr.stockmanage.model.vo.ProductVO;
 import com.axr.stockmanage.service.ProductService;
 import com.axr.stockmanage.service.StockService;
@@ -32,10 +32,9 @@ public class ProductServiceImpl implements ProductService {
     @Resource
     private StockMapper stockMapper;
 
-
     @Override
     @Transactional
-    public Integer addProduct(ProductAddDTO dto) {
+    public Long addProduct(ProductAddDTO dto) {
         if (productMapper.findByName(dto.getName()) != null) {
             throw new BusinessException("商品已存在");
         }
@@ -44,7 +43,7 @@ public class ProductServiceImpl implements ProductService {
                 .price(dto.getPrice())
                 .build();
         productMapper.addProduct(product);
-        Integer productId = product.getId();
+        Long productId = product.getId();
         Stock stock = Stock.builder()
                 .productId(productId)
                 .quantity(0)
@@ -55,8 +54,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public Integer deleteProduct(int id) {
-        if (productMapper.findById(id) == null) {
+    public Integer deleteProduct(long id) {
+        if (productMapper.findByIdForUpdate(id) == null) {
             throw new BusinessException("该商品不存在");
         }
         int stockResult = stockMapper.deleteByProductId(id);
@@ -70,7 +69,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public Integer updateProduct(ProductUpdateDTO dto) {
-        if (productMapper.findById(dto.getId()) == null) {
+        Product product = productMapper.findByIdForUpdate(dto.getId());
+        if (product == null) {
             throw new BusinessException("商品不存在");
         }
         return productMapper.updateProduct(dto);
@@ -78,8 +78,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public boolean updateProductStatus(int id) {
-        Product product = productMapper.findById(id);
+    public boolean updateProductStatus(long id) {
+        Product product = productMapper.findByIdForUpdate(id);
         if (product == null) {
             throw new BusinessException("商品不存在");
         }
@@ -97,12 +97,17 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public List<ProductVO> listAll() {
+        return productMapper.listAll();
+    }
+
+    @Override
     @Transactional
     public ProductVO purchaseProduct(ProductPurchaseDTO dto) {
         if (dto.getProductId() == null || dto.getQuantity() == null || dto.getQuantity() < 1) {
             throw new BusinessException("商品信息错误");
         }
-        Integer productId = dto.getProductId();
+        Long productId = dto.getProductId();
         stockService.updateStock(StockDTO.builder()
                 .productId(productId)
                 .updateQuantity(dto.getQuantity() * -1)

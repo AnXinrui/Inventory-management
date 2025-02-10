@@ -37,7 +37,7 @@ public class StockServiceImpl implements StockService {
 
 
     @Override
-    public Stock getStockByProductId(int productId) {
+    public Stock getStockByProductId(long productId) {
         return stockMapper.findByProductId(productId);
     }
 }

@@ -10,7 +10,7 @@ import lombok.Data;
 @Data
 @Builder
 public class Stock {
-    private Integer id;
-    private Integer productId;
+    private Long id;
+    private Long productId;
     private Integer quantity;
 }

@@ -2,10 +2,10 @@ package com.axr.stockmanage.controller;
 
 import com.axr.stockmanage.common.BusinessException;
 import com.axr.stockmanage.common.Result;
+import com.axr.stockmanage.model.dto.ProductAddDTO;
 import com.axr.stockmanage.model.dto.ProductPurchaseDTO;
 import com.axr.stockmanage.model.dto.ProductUpdateDTO;
 import com.axr.stockmanage.model.entity.Product;
-import com.axr.stockmanage.model.dto.ProductAddDTO;
 import com.axr.stockmanage.model.vo.ProductVO;
 import com.axr.stockmanage.service.ProductService;
 import org.springframework.web.bind.annotation.*;
@@ -25,13 +25,13 @@ public class ProductController {
     private ProductService productService;
 
     @PostMapping("add")
-    public Result<Integer> addProduct(@RequestBody ProductAddDTO dto) {
-        Integer id = productService.addProduct(dto);
+    public Result<Long> addProduct(@RequestBody ProductAddDTO dto) {
+        long id = productService.addProduct(dto);
         return Result.success(id);
     }
 
     @PostMapping("delete")
-    public Result<Integer> deleteProduct(Integer id) {
+    public Result<Integer> deleteProduct(Long id) {
         if (id == null) {
             throw new BusinessException("商品ID不能为空");
         }
@@ -39,8 +39,13 @@ public class ProductController {
     }
 
     @GetMapping("list")
-    public Result<List<ProductVO>> listProduct(Product product) {
+    public Result<List<ProductVO>> listProducts(Product product) {
         return Result.success(productService.list(product));
+    }
+
+    @GetMapping("listAll")
+    public Result<List<ProductVO>> listAllProducts() {
+        return Result.success(productService.listAll());
     }
 
     @PostMapping("update")
@@ -57,7 +62,10 @@ public class ProductController {
     }
 
     @PostMapping("updateStatus")
-    public Result<Boolean> updateStatus(Integer id) {
+    public Result<Boolean> updateStatus(Long id) {
+        if (id == null) {
+            throw new BusinessException("商品ID不能为空");
+        }
         return Result.success(productService.updateProductStatus(id));
     }
 }

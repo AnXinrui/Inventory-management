@@ -18,14 +18,14 @@ public interface StockMapper {
      * @param productId 商品ID
      * @return Stock 库存对象
      */
-    Stock findByProductId(int productId);
+    Stock findByProductId(long productId);
 
     /**
      * 加入悲观锁查询
      * @param productId 商品ID
      * @return 库存信息
      */
-    Stock findByProductIdForUpdate(@Param("productId") Integer productId);
+    Stock findByProductIdForUpdate(@Param("productId") long productId);
 
     /**
      * 修改库存
@@ -48,7 +48,6 @@ public interface StockMapper {
      * @param productId product id
      * @return r
      */
-    int deleteByProductId(int productId);
-
+    int deleteByProductId(long productId);
 
 }

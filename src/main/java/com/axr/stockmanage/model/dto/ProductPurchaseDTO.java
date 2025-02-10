@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 public class ProductPurchaseDTO {
 
-    private Integer productId;
+    private Long productId;
 
     private Integer quantity;
 }

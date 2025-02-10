@@ -28,7 +28,15 @@ public interface ProductMapper {
      * @param id 商品ID
      * @return 商品对象
      */
-    Product findById(int id);
+    Product findById(long id);
+
+    /**
+     * 根据商品 ID 查询并加锁，防止其他事务并发修改该记录。
+     *
+     * @param id 商品的唯一标识符（ID）
+     * @return Product
+     */
+    Product findByIdForUpdate(long id);
 
     /**
      * 根据商品名称查询商品
@@ -47,12 +55,19 @@ public interface ProductMapper {
     List<ProductVO> find(Product product);
 
     /**
+     * 查询所有 product
+     *
+     * @return productVo list
+     */
+    List<ProductVO> listAll();
+
+    /**
      * 删除商品
      *
      * @param id 商品ID
      * @return 受影响的行数
      */
-    int deleteProduct(int id);
+    int deleteProduct(long id);
 
     /**
      * 更新商品信息
@@ -69,6 +84,6 @@ public interface ProductMapper {
      * @param status 商品状态（0表示下架，1表示上架）
      * @return 受影响的行数
      */
-    int updateStatus(int id, int status);
+    int updateStatus(long id, int status);
 
 }
