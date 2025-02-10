@@ -1,6 +1,7 @@
 package com.axr.stockmanage.service.impl;
 
 import com.axr.stockmanage.common.BusinessException;
+import com.axr.stockmanage.mapper.ProductMapper;
 import com.axr.stockmanage.mapper.StockMapper;
 import com.axr.stockmanage.model.dto.StockDTO;
 import com.axr.stockmanage.model.entity.Stock;
@@ -15,6 +16,9 @@ public class StockServiceImpl implements StockService {
 
     @Resource
     private StockMapper stockMapper;
+
+    @Resource
+    private ProductMapper productMapper;
 
     @Override
     @Transactional

@@ -108,6 +108,10 @@ public class ProductServiceImpl implements ProductService {
             throw new BusinessException("商品信息错误");
         }
         Long productId = dto.getProductId();
+        Product product = productMapper.findByIdForUpdate(productId);
+        if (product == null || product.getStatus() != 1) {
+            throw new BusinessException("商品不存在或已下架");
+        }
         stockService.updateStock(StockDTO.builder()
                 .productId(productId)
                 .updateQuantity(dto.getQuantity() * -1)
