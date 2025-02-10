@@ -1,7 +1,6 @@
 package com.axr.stockmanage.service.impl;
 
 import com.axr.stockmanage.common.BusinessException;
-import com.axr.stockmanage.mapper.ProductMapper;
 import com.axr.stockmanage.mapper.StockMapper;
 import com.axr.stockmanage.model.dto.StockDTO;
 import com.axr.stockmanage.model.entity.Stock;
@@ -17,11 +16,8 @@ public class StockServiceImpl implements StockService {
     @Resource
     private StockMapper stockMapper;
 
-    @Resource
-    private ProductMapper productMapper;
-
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int updateStock(StockDTO dto) throws BusinessException {
         // 使用 FOR UPDATE 查询库存，并加锁
         Stock stock = stockMapper.findByProductIdForUpdate(dto.getProductId());
