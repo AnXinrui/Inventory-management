@@ -2,10 +2,10 @@ package com.axr.stockmanage;
 
 import com.axr.stockmanage.common.RedisIdWorker;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.annotation.Resource;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,34 +18,37 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @SpringBootTest
 class ApiTest {
+    private static final Logger log = LoggerFactory.getLogger(ApiTest.class);
 
-    @Resource
-    private RedisIdWorker worker;
+    private static final int THREAD_COUNT = 300; // 线程数
+    private static final int IDS_PER_THREAD = 100; // 每个线程生成 ID 的数量
 
-    private final ExecutorService executor = Executors.newFixedThreadPool(10);
-    @Autowired
-    private RedisIdWorker redisIdWorker;
+    private final ExecutorService executor = Executors.newFixedThreadPool(THREAD_COUNT);
+    private final RedisIdWorker redisIdWorker = new RedisIdWorker();
 
     @Test
     void testIdWorker() throws InterruptedException {
-        CountDownLatch latch = new CountDownLatch(300);
+        CountDownLatch latch = new CountDownLatch(THREAD_COUNT);
+
         Runnable task = () -> {
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < IDS_PER_THREAD; i++) {
                 long id = redisIdWorker.nextId("order");
-                System.out.println("id = " + id);
+                log.info("Generated ID: {}", id); // 使用 logger 代替 System.out
             }
             latch.countDown();
         };
+
         long start = System.currentTimeMillis();
-        for (int i = 0; i < 300; i++) {
+
+        for (int i = 0; i < THREAD_COUNT; i++) {
             executor.submit(task);
         }
 
-        latch.await();
+        latch.await(); // 等待所有线程完成
         long end = System.currentTimeMillis();
+        long duration = end - start;
 
-        System.out.println("time = " + (end - start));
-        assertTrue((end - start) < 10000, "Test took too long: " + (end - start) + " ms");
+        log.info("Test completed in {} ms", duration);
+        assertTrue(duration < 10000, "Test took too long: " + duration + " ms");
     }
-
 }
