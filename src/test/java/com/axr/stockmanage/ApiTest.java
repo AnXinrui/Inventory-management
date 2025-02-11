@@ -20,8 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ApiTest {
     private static final Logger log = LoggerFactory.getLogger(ApiTest.class);
 
-    private static final int THREAD_COUNT = 300; // 线程数
-    private static final int IDS_PER_THREAD = 100; // 每个线程生成 ID 的数量
+    private static final int THREAD_COUNT = 300;
+    private static final int IDS_PER_THREAD = 100;
 
     private final ExecutorService executor = Executors.newFixedThreadPool(THREAD_COUNT);
     private final RedisIdWorker redisIdWorker = new RedisIdWorker();
@@ -33,7 +33,7 @@ class ApiTest {
         Runnable task = () -> {
             for (int i = 0; i < IDS_PER_THREAD; i++) {
                 long id = redisIdWorker.nextId("order");
-                log.info("Generated ID: {}", id); // 使用 logger 代替 System.out
+                log.info("Generated ID: {}", id);
             }
             latch.countDown();
         };
@@ -44,7 +44,7 @@ class ApiTest {
             executor.submit(task);
         }
 
-        latch.await(); // 等待所有线程完成
+        latch.await();
         long end = System.currentTimeMillis();
         long duration = end - start;
 
