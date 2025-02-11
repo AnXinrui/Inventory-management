@@ -1,5 +1,7 @@
 package com.axr.stockmanage.service;
 
+import com.alicp.jetcache.anno.CacheInvalidate;
+import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.Cached;
 import com.axr.stockmanage.model.dto.ProductAddDTO;
 import com.axr.stockmanage.model.dto.ProductPurchaseDTO;
@@ -29,6 +31,7 @@ public interface ProductService {
      * @param dto 商品修改信息
      * @return 修改信息
      */
+    @CacheInvalidate(name = "productCache:", key = "'productId:' + #dto.id")
     Integer updateProduct(ProductUpdateDTO dto);
 
     /**
@@ -37,6 +40,7 @@ public interface ProductService {
      * @param id 商品ID
      * @return success
      */
+    @CacheInvalidate(name = "productCache:", key = "'productId:' + #id")
     Integer deleteProduct(long id);
 
     /**
@@ -45,13 +49,16 @@ public interface ProductService {
      * @param id 商品ID
      * @return success
      */
+    @CacheInvalidate(name = "productCache:", key = "'productId:' + #id")
     boolean updateProductStatus(long id);
 
     /**
      * 根据 id 获取商品
+     *
      * @param id id
      * @return product
      */
+    @Cached(cacheType = CacheType.BOTH, name = "productCache:", key = "'productId:' + #id")
     Product findById(long id);
 
     /**
@@ -73,8 +80,18 @@ public interface ProductService {
      * 购买 product
      *
      * @param dto 购买 product 信息
-     * @return 最新 product 信息
+     * @return bool
      */
-    ProductVO purchaseProduct(ProductPurchaseDTO dto);
+    @CacheInvalidate(name = "productCache:", key = "'productId:' + #dto.productId")
+    boolean purchaseProduct(ProductPurchaseDTO dto);
+
+    /**
+     * 商品秒杀
+     *
+     * @param id productId
+     * @return orderId
+     */
+    @CacheInvalidate(name = "productCache:", key = "'productId:' + #id")
+    long secKillProduct(Long id);
 
 }

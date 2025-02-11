@@ -1,25 +1,29 @@
 package com.axr.stockmanage.service.impl;
 
-import com.alicp.jetcache.anno.CacheType;
-import com.alicp.jetcache.anno.Cached;
 import com.axr.stockmanage.common.BusinessException;
+import com.axr.stockmanage.common.RedisIdWorker;
 import com.axr.stockmanage.mapper.ProductMapper;
-import com.axr.stockmanage.mapper.StockMapper;
 import com.axr.stockmanage.model.dto.ProductAddDTO;
 import com.axr.stockmanage.model.dto.ProductPurchaseDTO;
 import com.axr.stockmanage.model.dto.ProductUpdateDTO;
 import com.axr.stockmanage.model.dto.StockDTO;
+import com.axr.stockmanage.model.entity.Order;
 import com.axr.stockmanage.model.entity.Product;
 import com.axr.stockmanage.model.entity.Stock;
 import com.axr.stockmanage.model.vo.ProductVO;
+import com.axr.stockmanage.service.OrderService;
 import com.axr.stockmanage.service.ProductService;
 import com.axr.stockmanage.service.StockService;
+import com.axr.stockmanage.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author xinrui.an
@@ -33,7 +37,13 @@ public class ProductServiceImpl implements ProductService {
     @Resource
     private StockService stockService;
     @Resource
-    private StockMapper stockMapper;
+    private RedisIdWorker idWorker;
+    @Resource
+    private OrderService orderService;
+
+    private final UserService userService = new UserService();
+
+    private final Map<Long, ReentrantLock> lockMap = new ConcurrentHashMap<>();
 
     @Override
     @Transactional
@@ -51,7 +61,7 @@ public class ProductServiceImpl implements ProductService {
                 .productId(productId)
                 .quantity(0)
                 .build();
-        stockMapper.add(stock);
+        stockService.addStock(stock);
         return productId;
     }
 
@@ -61,7 +71,7 @@ public class ProductServiceImpl implements ProductService {
         if (productMapper.findByIdForUpdate(id) == null) {
             throw new BusinessException("该商品不存在");
         }
-        int stockResult = stockMapper.deleteByProductId(id);
+        int stockResult = stockService.deleteStock(id);
         int productResult = productMapper.deleteProduct(id);
         if (stockResult != 1 || productResult != 1) {
             throw new BusinessException("删除商品失败");
@@ -95,7 +105,6 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @Cached(name = "productCache:", key = "'productId:' + #id", expire = 30, timeUnit = TimeUnit.SECONDS)
     public Product findById(long id) {
         return productMapper.findById(id);
     }
@@ -112,23 +121,75 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public ProductVO purchaseProduct(ProductPurchaseDTO dto) {
+    public boolean purchaseProduct(ProductPurchaseDTO dto) {
         if (dto.getProductId() == null || dto.getQuantity() == null || dto.getQuantity() < 1) {
             throw new BusinessException("商品信息错误");
         }
         Long productId = dto.getProductId();
         Product product = productMapper.findByIdForUpdate(productId);
-        if (product == null || product.getStatus() != 1) {
+        Stock stock = stockService.findByProductId(productId);
+
+        if (product == null || product.getStatus() != 1 || stock == null) {
             throw new BusinessException("商品不存在或已下架");
         }
-        stockService.updateStock(StockDTO.builder()
-                .productId(productId)
-                .updateQuantity(dto.getQuantity() * -1)
-                .build());
-        List<ProductVO> products = productMapper.find(Product.builder().id(productId).build());
-        if (products.isEmpty()) {
-            throw new BusinessException("系统错误");
+        if (stock.getQuantity() < dto.getQuantity()) {
+            throw new BusinessException("库存不足");
         }
-        return products.get(0);
+        StockDTO stockDTO = StockDTO.builder()
+                .productId(productId)
+                .updateQuantity(dto.getQuantity())
+                .build();
+        int res = stockService.updateStockWithCAS(stockDTO);
+        if (res < 1) {
+            throw new BusinessException("扣减失败");
+        }
+        return true;
+    }
+
+    @Override
+    @Transactional
+    public long secKillProduct(Long id) {
+        Product product = productMapper.findByIdForUpdate(id);
+        Stock stock = stockService.findByProductId(id);
+
+        if (product == null || product.getStatus() != 1 || stock == null) {
+            throw new BusinessException("商品不存在或已下架");
+        }
+        if (stock.getQuantity() < 1) {
+            throw new BusinessException("库存不足");
+        }
+
+        long userId = userService.getUserId();
+        ReentrantLock lock = lockMap.computeIfAbsent(userId, k -> new ReentrantLock());
+        lock.lock();
+        try {
+            int count = orderService.countByUserId(userId);
+            if (count > 0) {
+                throw new BusinessException("每人只能参与一次秒杀");
+            }
+
+            StockDTO dto = StockDTO.builder()
+                    .productId(id)
+                    .updateQuantity(-1)
+                    .build();
+            int res = stockService.updateStockWithCAS(dto);
+            if (res < 1) {
+                throw new BusinessException("扣减失败");
+            }
+            Order order = new Order();
+            long orderId = idWorker.nextId("order");
+            order.setId(orderId);
+            order.setUserId(userId);
+            order.setProductId(id);
+            order.setShopId(1L);
+            order.setStatus(10);
+            order.setCreateTime(LocalDateTime.now());
+            orderService.addOrder(order);
+            return orderId;
+        } finally {
+            lock.unlock();
+            lockMap.remove(userId);
+        }
+
     }
 }

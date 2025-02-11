@@ -1,16 +1,16 @@
 package com.axr.stockmanage;
 
-import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.CacheManager;
-import com.alicp.jetcache.template.QuickConfig;
+import com.axr.stockmanage.common.RedisIdWorker;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.time.Duration;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author xinrui.an
@@ -20,25 +20,32 @@ import java.time.Duration;
 class ApiTest {
 
     @Resource
-    private CacheManager cacheManager;
+    private RedisIdWorker worker;
 
-    private Cache<Long, String> strCache;
-
-    @PostConstruct
-    public void init() {
-        QuickConfig qc = QuickConfig.newBuilder("userCache") // name用于统计信息展示名字
-                .expire(Duration.ofSeconds(100))
-                //.cacheType(CacheType.BOTH) // 创建一个两级缓存
-                //.localLimit(100) // 本地缓存元素个数限制，只对CacheType.LOCAL和CacheType.BOTH有效
-                //.syncLocal(true) // 两级缓存的情况下，缓存更新时发消息让其它JVM实例中的缓存失效，需要配置broadcastChannel才生效。
-                .build();
-        strCache = cacheManager.getOrCreateCache(qc);
-    }
+    private final ExecutorService executor = Executors.newFixedThreadPool(10);
+    @Autowired
+    private RedisIdWorker redisIdWorker;
 
     @Test
-    void test() {
-        strCache.put(1L, "hello");
-        System.out.println(strCache.get(1L));
+    void testIdWorker() throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(300);
+        Runnable task = () -> {
+            for (int i = 0; i < 100; i++) {
+                long id = redisIdWorker.nextId("order");
+                System.out.println("id = " + id);
+            }
+            latch.countDown();
+        };
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < 300; i++) {
+            executor.submit(task);
+        }
+
+        latch.await();
+        long end = System.currentTimeMillis();
+
+        System.out.println("time = " + (end - start));
+        assertTrue((end - start) < 10000, "Test took too long: " + (end - start) + " ms");
     }
 
 }

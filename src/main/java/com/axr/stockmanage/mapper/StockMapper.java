@@ -36,6 +36,14 @@ public interface StockMapper {
     int updateStock(StockDTO dto);
 
     /**
+     * 修改库存 (CAS)
+     *
+     * @param dto 库存修改信息
+     * @return int 返回更新的记录数
+     */
+    int updateStockWithCAS(StockDTO dto);
+
+    /**
      * 新增库存信息
      *
      * @param stock stock

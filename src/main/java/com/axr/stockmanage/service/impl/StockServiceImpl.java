@@ -17,6 +17,21 @@ public class StockServiceImpl implements StockService {
     private StockMapper stockMapper;
 
     @Override
+    public void addStock(Stock stock) {
+        stockMapper.add(stock);
+    }
+
+    @Override
+    public int deleteStock(long id) {
+        return stockMapper.deleteByProductId(id);
+    }
+
+    @Override
+    public Stock findByProductId(long id) {
+        return stockMapper.findByProductId(id);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class, timeout = 1000)
     public int updateStock(StockDTO dto) throws BusinessException {
         // 使用 FOR UPDATE 查询库存，并加锁
@@ -33,6 +48,11 @@ public class StockServiceImpl implements StockService {
             throw new BusinessException("库存更新失败");
         }
         return updated;
+    }
+
+    @Override
+    public int updateStockWithCAS(StockDTO stockDTO) {
+        return stockMapper.updateStockWithCAS(stockDTO);
     }
 
 

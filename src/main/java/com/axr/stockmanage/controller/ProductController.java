@@ -63,8 +63,16 @@ public class ProductController {
     }
 
     @PostMapping("purchase")
-    public Result<ProductVO> productPurchase(@RequestBody ProductPurchaseDTO dto) {
+    public Result<Boolean> productPurchase(@RequestBody ProductPurchaseDTO dto) {
         return Result.success(productService.purchaseProduct(dto));
+    }
+
+    @PostMapping("scekill/{id}")
+    public Result<Long> secKillProduct(@PathVariable Long id) {
+        if (null == id || id <= 0) {
+            throw new BusinessException("商品 ID 异常");
+        }
+        return Result.success(productService.secKillProduct(id));
     }
 
     @PostMapping("updateStatus")

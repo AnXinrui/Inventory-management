@@ -14,4 +14,5 @@ public class StockDTO {
     private Long productId;
 
     private Integer updateQuantity;
+
 }

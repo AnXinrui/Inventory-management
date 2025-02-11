@@ -42,6 +42,30 @@ CREATE TABLE t_stock
 
 ```
 
+**订单表**
+```mysql
+CREATE TABLE `t_order` (
+  `id` bigint unsigned NOT NULL COMMENT '主键ID',
+  `user_id` bigint  NOT NULL COMMENT '用户id',
+  `shop_id` bigint unsigned NOT NULL DEFAULT '0' COMMENT '门店ID',
+  `status` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '订单状态， 10 已新建， 20 已支付，90 已完成，0 已取消 ',
+  `pay_money` decimal(12,4) unsigned NOT NULL COMMENT '订单金额',
+  `pay_time` datetime DEFAULT NULL COMMENT '支付时间',
+  `cancel_time` datetime DEFAULT NULL COMMENT '取消时间',
+  `finish_time` datetime DEFAULT NULL COMMENT '完成时间',
+  `create_id` varchar(32) DEFAULT NULL COMMENT '创建人ID',
+  `create_name` varchar(60) DEFAULT NULL COMMENT '创建人',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `modify_id` varchar(32) DEFAULT NULL COMMENT '修改人ID',
+  `modify_name` varchar(60) DEFAULT NULL COMMENT '修改人',
+  `modify_time` datetime NOT NULL COMMENT '更新时间',
+  `version` int NOT NULL COMMENT '版本号，用作乐观锁控制',
+  PRIMARY KEY (`id`),
+  KEY `idx_shop_id` (`shop_id`) USING BTREE,
+  KEY `idx_user_id` (`user_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4  COMMENT='订单主表';
+```
+
 #### 核心功能：
 - 商品
   - 新增商品 （默认库存为 0）

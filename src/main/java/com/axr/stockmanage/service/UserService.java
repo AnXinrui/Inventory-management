@@ -7,9 +7,10 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class UserService {
+
     @Cached(name = "userCache:", key = "#name", expire = 30, timeUnit = TimeUnit.SECONDS)
-    public String getUser(String name) {
-        System.out.println("Fetching from database: " + name);
-        return "User: " + name;
+    public long getUserId() {
+        return 1L;
     }
+
 }
