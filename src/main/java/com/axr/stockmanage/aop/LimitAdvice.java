@@ -31,8 +31,7 @@ public class LimitAdvice {
             if (key == null || key.trim().isEmpty()) {
                 throw new IllegalArgumentException("Limit key cannot be empty");
             }
-            RateLimiter rateLimiter = null;
-            rateLimiter = limiterMap.computeIfAbsent(key, k -> {
+            RateLimiter rateLimiter = limiterMap.computeIfAbsent(key, k -> {
                 log.info("新建了令牌桶={}，容量={}", k, limit.permitsPerSecond());
                 return RateLimiter.create(limit.permitsPerSecond());
             });
