@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -53,14 +54,15 @@ public class ProductServiceImpl implements ProductService {
     private OrderService orderService;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
-
-    private final UserService userService = new UserService();
+    @Resource
+    private UserService userService;
 
     private final Map<Long, ReentrantLock> lockMap = new ConcurrentHashMap<>();
 
     private static final String PREFIX = "seckill:stock:";
 
     private static final DefaultRedisScript<Long> SECKILL_SCRIPT;
+
     static {
         SECKILL_SCRIPT = new DefaultRedisScript<>();
         SECKILL_SCRIPT.setLocation(new ClassPathResource("seckill.lua"));
@@ -73,10 +75,19 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private static final ExecutorService SECKILL_ORDER_EXECUTOR = Executors.newSingleThreadExecutor();
+
+    @PreDestroy
+    public void destroy() {
+        if (!SECKILL_ORDER_EXECUTOR.isShutdown()) {
+            SECKILL_ORDER_EXECUTOR.shutdown();
+        }
+    }
+
     private class OrderHandler implements Runnable {
 
         private boolean running = true;
         String queueName = "stream.orders";
+
         @Override
         public void run() {
             while (running) {
@@ -303,7 +314,11 @@ public class ProductServiceImpl implements ProductService {
 
             stringRedisTemplate.opsForValue().set(PREFIX + product.getId(), stock.getQuantity().toString());
         }
-        if (Integer.parseInt(Objects.requireNonNull(stringRedisTemplate.opsForValue().get(PREFIX + id.toString()))) < 1) {
+        String stockStr = stringRedisTemplate.opsForValue().get(PREFIX + id.toString());
+        if (stockStr == null) {
+            throw new BusinessException("商品库存数据异常");
+        }
+        if (Integer.parseInt(stockStr) < 1) {
             throw new BusinessException("库存不足");
         }
 
@@ -327,7 +342,6 @@ public class ProductServiceImpl implements ProductService {
         }
         return orderId;
     }
-
 
 
 }
