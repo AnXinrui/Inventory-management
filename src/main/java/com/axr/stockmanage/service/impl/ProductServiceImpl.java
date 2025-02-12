@@ -58,7 +58,9 @@ public class ProductServiceImpl implements ProductService {
     @Resource
     private UserService userService;
 
-    // 降级开关：控制是否统计商品浏览次数
+    /**
+     * 降级开关：控制是否统计商品浏览次数
+     */
     @Value("${feature.toggle.viewCount:true}")
     private boolean enableViewCount;
 
