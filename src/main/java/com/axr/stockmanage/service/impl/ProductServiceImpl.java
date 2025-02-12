@@ -17,6 +17,7 @@ import com.axr.stockmanage.service.ProductService;
 import com.axr.stockmanage.service.StockService;
 import com.axr.stockmanage.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -56,6 +57,10 @@ public class ProductServiceImpl implements ProductService {
     private StringRedisTemplate stringRedisTemplate;
     @Resource
     private UserService userService;
+
+    // 降级开关：控制是否统计商品浏览次数
+    @Value("${feature.toggle.viewCount:true}")
+    private boolean enableViewCount;
 
     private final Map<Long, ReentrantLock> lockMap = new ConcurrentHashMap<>();
 
@@ -205,6 +210,14 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product findById(long id) {
+        Product product = productMapper.findById(id);
+        if (product != null && enableViewCount) {
+            String redisKey = "product:viewCount:" + id;
+            stringRedisTemplate.opsForValue().increment(redisKey, 1);
+            if (stringRedisTemplate.getExpire(redisKey) == -1) {
+                stringRedisTemplate.expire(redisKey, 1, TimeUnit.DAYS);
+            }
+        }
         return productMapper.findById(id);
     }
 
@@ -345,5 +358,20 @@ public class ProductServiceImpl implements ProductService {
         return orderId;
     }
 
+    @Override
+    public long getViewCount(long productId) {
+        String redisKey = "product:viewCount:" + productId;
+        String countStr = stringRedisTemplate.opsForValue().get(redisKey);
+        return countStr == null ? 0L : Long.parseLong(countStr);
+    }
 
+    public boolean checkViewCount(Long productId) {
+        if (!enableViewCount) {
+            return true;
+        }
+        long count = getViewCount(productId);
+
+        // 如果浏览人数超过阈值，则触发降级
+        return count <= 10000;
+    }
 }

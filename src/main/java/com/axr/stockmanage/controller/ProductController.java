@@ -9,6 +9,8 @@ import com.axr.stockmanage.model.dto.ProductUpdateDTO;
 import com.axr.stockmanage.model.entity.Product;
 import com.axr.stockmanage.model.vo.ProductVO;
 import com.axr.stockmanage.service.ProductService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -18,6 +20,7 @@ import java.util.List;
  * @author xinrui.an
  * @date 2025/01/21
  */
+@Slf4j
 @RestController
 @RequestMapping("product")
 public class ProductController {
@@ -41,7 +44,14 @@ public class ProductController {
     }
 
     @GetMapping(value = "/{id}")
+    @CircuitBreaker(name = "viewCountCircuitBreaker", fallbackMethod = "fallbackGetProduct")
     public Result<Product> findProduct(@PathVariable Long id) {
+
+        // 如果浏览人数超过阈值，则触发降级
+        if (!productService.checkViewCount(id)) {
+            throw new BusinessException("浏览人数过多，已触发降级");
+        }
+
         Product product = productService.findById(id);
         return Result.success(product);
     }
@@ -85,4 +95,24 @@ public class ProductController {
         }
         return Result.success(productService.updateProductStatus(id));
     }
+
+    @GetMapping("/viewCount/{id}")
+    public Result<Long> getViewCount(@PathVariable Long id) {
+        return Result.success(productService.getViewCount(id));
+    }
+
+    /**
+     * 降级方法
+     * @param id 商品ID
+     * @param throwable 发生的异常
+     * @return 降级结果
+     */
+    public Result<Product> fallbackGetProduct(Long id, Throwable throwable) {
+        // 记录降级信息
+        log.warn("进入降级方法，商品ID = {}, 错误原因: {}", id, throwable.getMessage());
+
+        // 可以返回降级的商品数据，或者一个简单的提示信息
+        return Result.fail("当前商品浏览人数过多，服务暂时不可用，请稍后再试");
+    }
+
 }

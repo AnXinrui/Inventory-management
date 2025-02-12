@@ -6,22 +6,15 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   main:
     allow-circular-references: true
-#  redis:
-#    host: localhost
-#    port: 6379
 
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-#  type-aliases-package: org.axr.model
-#  configuration:
-#    map-underscore-to-camel-case: true
 
 logging:
   level:
     com.alicp.jetcache: debug
-
 
 jetcache:
   statIntervalMinutes: 15
@@ -45,3 +38,15 @@ jetcache:
         maxIdle: 20
         maxTotal: 50
 
+resilience4j.circuitbreaker:
+  instances:
+    viewCountCircuitBreaker:
+      registerHealthIndicator: true
+      failureRateThreshold: 50  # 错误率阈值，超过50%则触发熔断
+      waitDurationInOpenState: 10000ms  # 熔断器打开状态持续时间
+      permittedNumberOfCallsInHalfOpenState: 3  # 半开状态下允许的请求次数
+      slidingWindowSize: 100  # 滑动窗口大小
+
+feature:
+  toggle:
+    viewCount: true  # true 表示启用浏览统计，false 表示降级关闭此功能

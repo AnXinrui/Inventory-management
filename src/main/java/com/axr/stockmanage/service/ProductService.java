@@ -94,4 +94,19 @@ public interface ProductService {
     @CacheInvalidate(name = "productCache:", key = "'productId:' + #id")
     long secKillProduct(Long id);
 
+    /**
+     * 获取指定商品的浏览次数
+     *
+     * @param productId productId
+     * @return viewCount
+     */
+    long getViewCount(long productId);
+
+    /**
+     * 判断是否需要降级
+     *
+     * @param productId product
+     * @return boolean
+     */
+    boolean checkViewCount(Long productId);
 }
