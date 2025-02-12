@@ -258,7 +258,9 @@ public class ProductServiceImpl implements ProductService {
                 throw new BusinessException("库存不足");
             }
 
+            stringRedisTemplate.multi();
             stringRedisTemplate.opsForValue().set(PREFIX + product.getId(), stock.getQuantity().toString());
+            stringRedisTemplate.exec();
         }
         if (Integer.parseInt(Objects.requireNonNull(stringRedisTemplate.opsForValue().get(PREFIX + id.toString()))) < 1) {
             throw new BusinessException("库存不足");
