@@ -1,5 +1,6 @@
 package com.axr.stockmanage.controller;
 
+import com.axr.stockmanage.annotation.Limit;
 import com.axr.stockmanage.common.BusinessException;
 import com.axr.stockmanage.common.Result;
 import com.axr.stockmanage.model.dto.ProductAddDTO;
@@ -23,6 +24,7 @@ public class ProductController {
 
     @Resource
     private ProductService productService;
+
 
     @PostMapping("add")
     public Result<Long> addProduct(@RequestBody ProductAddDTO dto) {
@@ -67,6 +69,7 @@ public class ProductController {
         return Result.success(productService.purchaseProduct(dto));
     }
 
+    @Limit(key = "scekill", permitsPerSecond = 10)
     @PostMapping("scekill/{id}")
     public Result<Long> secKillProduct(@PathVariable Long id) {
         if (null == id || id <= 0) {
