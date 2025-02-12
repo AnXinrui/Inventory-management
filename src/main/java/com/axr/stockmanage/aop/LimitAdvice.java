@@ -28,14 +28,14 @@ public class LimitAdvice {
     public Object method(ProceedingJoinPoint pjp, Limit limit) throws Throwable {
         if (null != limit) {
             String key = limit.key();
-            RateLimiter rateLimiter = null;
-            if (!limiterMap.containsKey(key)) {
-                rateLimiter = RateLimiter.create(limit.permitsPerSecond());
-                limiterMap.put(key, rateLimiter);
-                log.info("新建了令牌桶={}，容量={}", key, limit.permitsPerSecond());
-            } else {
-                rateLimiter = limiterMap.get(key);
+            if (key == null || key.trim().isEmpty()) {
+                throw new IllegalArgumentException("Limit key cannot be empty");
             }
+            RateLimiter rateLimiter = null;
+            rateLimiter = limiterMap.computeIfAbsent(key, k -> {
+                log.info("新建了令牌桶={}，容量={}", k, limit.permitsPerSecond());
+                return RateLimiter.create(limit.permitsPerSecond());
+            });
             boolean acquire = rateLimiter.tryAcquire(limit.timeout(), limit.timeunit());
             if (!acquire) {
                 log.warn("令牌桶={}，获取令牌失败", key);
