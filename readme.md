@@ -48,6 +48,7 @@ CREATE TABLE `t_order` (
   `id` bigint unsigned NOT NULL COMMENT '主键ID',
   `user_id` bigint  NOT NULL COMMENT '用户id',
   `shop_id` bigint unsigned NOT NULL DEFAULT '0' COMMENT '门店ID',
+  `product_id` bigint  NOT NULL COMMENT '商品id',
   `status` tinyint unsigned NOT NULL DEFAULT '0' COMMENT '订单状态， 10 已新建， 20 已支付，90 已完成，0 已取消 ',
   `pay_money` decimal(12,4) unsigned NOT NULL COMMENT '订单金额',
   `pay_time` datetime DEFAULT NULL COMMENT '支付时间',
@@ -59,7 +60,6 @@ CREATE TABLE `t_order` (
   `modify_id` varchar(32) DEFAULT NULL COMMENT '修改人ID',
   `modify_name` varchar(60) DEFAULT NULL COMMENT '修改人',
   `modify_time` datetime NOT NULL COMMENT '更新时间',
-  `version` int NOT NULL COMMENT '版本号，用作乐观锁控制',
   PRIMARY KEY (`id`),
   KEY `idx_shop_id` (`shop_id`) USING BTREE,
   KEY `idx_user_id` (`user_id`) USING BTREE
@@ -79,3 +79,8 @@ CREATE TABLE `t_order` (
 - 库存
   - 增加或减少库存
   - 查询库存
+- 秒杀功能： redis 进行校验 -> 消息队列 -> 数据库扣减库存，生成订单
+  - 基于乐观锁CAS 方法进行库存扣减
+- 限流
+- 降级
+- 统计访问量
