@@ -81,6 +81,6 @@ CREATE TABLE `t_order` (
   - 查询库存
 - 秒杀功能： redis 进行校验 -> 消息队列 -> 数据库扣减库存，生成订单
   - 基于乐观锁CAS 方法进行库存扣减
-- 限流
-- 降级
-- 统计访问量
+- 限流：使用RateLimiter结合AOP实现自定义限流注解
+- 降级：采用 resilience4j 实现降级
+- 统计访问量： redis 进行统计
